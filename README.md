@@ -8,9 +8,10 @@ system provided by [nrf52x-base](https://github.com/lab11/nrf52x-base).
 ## Requirements
  
  1. Various tools
-		* build-essential (make)
-		* python3
-		* git
+ 
+    * build-essential (make)
+    * python3
+    * git
 
  2. ARM cross-compiler toolchain: [gcc-arm-none-eabi toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 
