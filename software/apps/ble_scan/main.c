@@ -33,7 +33,15 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
   uint8_t* adv_buf = adv_report->data.p_data; // array of up to 31 bytes of advertisement payload data
   uint16_t adv_len = adv_report->data.len; // length of advertisement payload data
 
-  printf("Received an advertisement!\n");
+  if (ble_addr[5] == 0xc0 && ble_addr[4] == 0x98 && ble_addr[3] == 0xe5){
+    printf("BLE Address: %x:%x:%x:%x:%x:%x\n", ble_addr[5], ble_addr[4], ble_addr[3], ble_addr[2], ble_addr[1], ble_addr[0]);
+    printf("Adv_len: %04x\n", adv_len);
+    printf("Adv_payload: ");
+    for (int i = 30; i > -1; --i){
+      printf("%x", adv_buf[i]);
+    }
+    printf("\n");
+  }
 }
 
 
