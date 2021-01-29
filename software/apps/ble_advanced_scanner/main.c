@@ -37,8 +37,18 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
   if (ble_addr[5] == 0xc0 && ble_addr[4] == 0x98 && ble_addr[3] == 0xe5){
     printf("BLE Address: %x:%x:%x:%x:%x:%x\n", ble_addr[5], ble_addr[4], ble_addr[3], ble_addr[2], ble_addr[1], ble_addr[0]);
     printf("Adv_len: %d\n", adv_len);
-    printf("Adv_payload: ");
-    for (int i = 30; i > -1; --i){
+    printf("Adv_payload: \n");
+    int i = 0;
+    while (i < 31){
+      int length = (int) adv_buf[i];
+      if (adv_buf[++i] == 0xff){
+        printf("%s\n", adv_buf+i+1);
+      }
+      printf("\n");
+      i += length;
+    }
+    printf("\n");
+    for (i = 0; i < adv_len; ++i){
       printf("%02x/", adv_buf[i]);
     }
     printf("\n");
