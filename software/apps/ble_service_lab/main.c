@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
@@ -29,7 +30,11 @@ static simple_ble_service_t led_service = {{
 }};
 
 static simple_ble_char_t led_state_char = {.uuid16 = 0x1089};
-static bool led_state = false;
+static simple_ble_char_t print_state_char = {.uuid16 = 0x108A};
+static simple_ble_char_t button_state_char = {.uuid16 = 0x108B};
+static uint8_t led_state = 0;
+static uint8_t last_button = 0;
+static uint8_t number = 0;
 
 /*******************************************************************************
  *   State for this application
@@ -44,13 +49,38 @@ void ble_evt_write(ble_evt_t const* p_ble_evt) {
     printf("Got write to LED characteristic!\n");
 
     // Use value written to control LED
-    if (led_state != 0) {
-      printf("Turning on LED!\n");
+    if (led_state == 1) {
+      printf("Turning on LED 1!\n");
       nrf_gpio_pin_clear(LED1);
     } else {
-      printf("Turning off LED!\n");
       nrf_gpio_pin_set(LED1);
     }
+    if (led_state == 2) {
+      printf("Turning on LED 2!\n");
+      nrf_gpio_pin_clear(LED2);
+    } else {
+      nrf_gpio_pin_set(LED2);
+    }
+    if (led_state == 3) {
+      printf("Turning on LED 3!\n");
+      nrf_gpio_pin_clear(LED3);
+    } else {
+      nrf_gpio_pin_set(LED3);
+    }
+    if (led_state == 4) {
+      printf("Turning on LED 4!\n");
+      nrf_gpio_pin_clear(LED4);
+    } else {
+      nrf_gpio_pin_set(LED4);
+    }
+  }
+
+  if (simple_ble_is_char_event(p_ble_evt, &print_state_char)){
+    printf("Printing total clicked: %d\n", number);
+  }
+
+  if (simple_ble_is_char_event(p_ble_evt, &button_state_char)){
+    printf("Button %d clicked", last_button);
   }
 }
 
@@ -75,17 +105,44 @@ int main(void) {
       sizeof(led_state), (uint8_t*)&led_state,
       &led_service, &led_state_char);
 
+  simple_ble_add_characteristic(1, 0, 1, 0,
+      sizeof(last_button), (uint8_t*)&last_button,
+      &led_service, &button_state_char);
+
+  simple_ble_add_characteristic(1, 1, 0, 0,
+      sizeof(number), (uint8_t*)&number,
+      &led_service, &print_state_char);
   // Start Advertising
   simple_ble_adv_only_name();
-
   while(1) {
-    if (nrf_gpio_pin_read(BUTTON1)) {
-      nrf_gpio_pin_set(LED1);
-    } else {
-      nrf_gpio_pin_clear(LED1);
+    if (!nrf_gpio_pin_read(BUTTON1)) {
+      last_button = 1;
+      number++;
+      simple_ble_notify_char(&button_state_char);
+      nrf_delay_ms(500);
     }
-    
-    power_manage();
+    else if(!nrf_gpio_pin_read(BUTTON2)) {
+      last_button = 2;  
+      number++;
+      simple_ble_notify_char(&button_state_char);
+      nrf_delay_ms(500);    
+    } else if(!nrf_gpio_pin_read(BUTTON3)){
+      last_button = 3;
+      number++;
+      simple_ble_notify_char(&button_state_char);
+      nrf_delay_ms(500);
+    }
+    else if(!nrf_gpio_pin_read(BUTTON4)){
+      last_button = 4;
+      number++;
+      simple_ble_notify_char(&button_state_char);
+      nrf_delay_ms(500);
+    }
+    else{
+      simple_ble_notify_char(&print_state_char);
+      nrf_delay_ms(500);
+    }
+    // power_manage();
   }
 }
 

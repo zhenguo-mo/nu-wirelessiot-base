@@ -2,3 +2,5 @@ _build/
 *.swp
 .gdbinit
 compiled_commands.json
+.AppImage
+.*/__pycache__.*
