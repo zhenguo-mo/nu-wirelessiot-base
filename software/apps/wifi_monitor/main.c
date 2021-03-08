@@ -8,7 +8,7 @@
 #define UART_RX_BUF_SIZE     512
 #define MAX_TEST_DATA_BYTES     (15U)   
 
-// error handler for UART
+// event handler for UART
 void uart_error_handle (app_uart_evt_t * p_event) {
   if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR) 
     {
@@ -34,6 +34,7 @@ void uart_error_handle (app_uart_evt_t * p_event) {
       buf.size++;
     }
 }
+
 
 // initialization of UART
 void uart_init(void) {
@@ -66,45 +67,27 @@ void uart_init(void) {
 
 }
 
-
 int main(void) {
   // init uart
   uart_init();
-  int rssi = esp_get_rssi();
-  int ping = esp_get_ping();
-  // char hex_ping[5];
-  // if (ping <= 0xFFFF){
-  //   sprintf(hex_ping, "%04x", ping);
-  // } else{
-  //   sprintf(hex_ping, "FFFF");
-  // }
-  // hex_ping[4] = 0;
-  // char val_one[3];
-  // char val_two[3];
-  
-  // val_one[0] = hex_ping[0];
-  // val_one[1] = hex_ping[1];
-  // val_one[2] = 0;
-
-  // val_two[0] = hex_ping[2];
-  // val_two[1] = hex_ping[3];
-  // val_two[2] = 0;
-
-  // printf("FINISHED\n");
-  printf("RSSI: %i\n", rssi);
-  printf("PING: %i\n", ping);
-  fflush(stdout);
 
   simple_ble_app = simple_ble_init(&ble_config);
-
-  // Start Advertising
-  uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x08, 0x09, 0x54, 0x45, 0x43, 0x48, 0x34, 0x39, 0x37,
-0x02, 0x0A, rssi, 0x03, 0xFF, ping};
-
-  simple_ble_adv_raw(ble_data, 19);
-  printf("Started BLE advertisements\n");
-
+  begin_scanning();
+  advertising_stop();
   while (1) {
-    power_manage();
+    /* IF SCANNING SUCCESSFUL (global variable first <= latest global variable), DO RSSI and ADVERTISING */
+    if (serviced_adv_id < latest_id){
+      serviced_adv_id = latest_id;
+      int rssi = esp_get_rssi();
+      int ping = esp_get_ping();
+      printf("RSSI: %i\n", rssi);
+      printf("PING: %i\n", ping);
+      fflush(stdout);
+
+      begin_advertising(rssi, ping);
+      nrf_delay_ms(20000);
+      advertising_stop();
+      printf("STOPPED BLE ADVERTISING\n");
+    }
   }
 }

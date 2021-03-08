@@ -1,4 +1,6 @@
 #include "peripheral.h"
+uint8_t serviced_adv_id = 0;
+uint8_t latest_id = 1;
 
 void esp_send(const char* command) {
     uint8_t len = strlen(command); 
@@ -66,11 +68,30 @@ int esp_get_rssi() {
 
 /* BLE FUNCTIONS */
 
-void begin_advertising(){
-    simple_ble_app = simple_ble_init(&ble_config);
-
+void begin_advertising(int ping, int rssi){
     // Start Advertising
-    simple_ble_adv_only_name();
-    printf("Started BLE advertisements with name %s\n", ble_config.adv_name);
-    
+    uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x08, 0x09, 0x54, 0x45, 0x43, 0x48, 0x34, 0x39, 0x37,
+    0x02, 0x0A, rssi, 0x03, 0xFF, ping};
+
+    simple_ble_adv_raw(ble_data, 19);
+    printf("Started BLE advertisements\n");
+}
+
+// event handler for BLE
+void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
+
+    // extract the fields we care about
+    ble_gap_evt_adv_report_t const* adv_report = &(p_ble_evt->evt.gap_evt.params.adv_report);
+    uint8_t const* ble_addr = adv_report->peer_addr.addr; // array of 6 bytes of the address
+    uint8_t* adv_buf = adv_report->data.p_data; // array of up to 31 bytes of advertisement payload data
+    uint16_t adv_len = adv_report->data.len; // length of advertisement payload data
+
+
+    if (ble_addr[5] == 0xc0 && ble_addr[4] == 0x98 && ble_addr[3] == 0xe5){
+        latest_id = adv_buf[5];
+    }
+}
+
+void begin_scanning(){
+    scanning_start();
 }

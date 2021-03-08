@@ -20,6 +20,9 @@ struct B
   size_t size; 
 } buf;
 
+extern uint8_t serviced_adv_id;
+extern uint8_t latest_id;
+
 // BLUETOOTH ADVERTISING SETUP
 // Intervals for advertising and connections
 static simple_ble_config_t ble_config = {
@@ -36,9 +39,18 @@ simple_ble_app_t* simple_ble_app;
 
 /* BLE FUNCTIONS */
 
-void begin_advertising();
+/* Begin advertising the results of a speed test */
+void begin_advertising(int ping, int rssi);
+
+/* Callback handler for reading from central when to begin speedtest */
+void ble_evt_adv_report(ble_evt_t const* p_ble_evt);
+
+/* Begin scanning for central for when it's asking for data */
+void begin_scanning();
 
 /* END OF BLE FUNCTIONS */
+
+/* WIFI FUNCTIONS */
 
 // Function for connecting the ESP to the internet
 void esp_init();
@@ -61,3 +73,5 @@ void esp_receive(char* buf);
 
 // Resets the global variable buffer (buf).
 void reset_buffer();
+
+/* END OF WIFI FUNCTIONS */
