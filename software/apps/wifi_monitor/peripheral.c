@@ -1,6 +1,6 @@
 #include "peripheral.h"
-uint8_t serviced_adv_id = 0;
-uint8_t latest_id = 0;
+
+bool service_request = false;
 
 void esp_send(const char* command) {
     uint8_t len = strlen(command); 
@@ -14,35 +14,17 @@ void esp_send(const char* command) {
     } 
 }
 
-// waits for a command to finish and prepares for the next one
-int esp_wait() { 
-    while (strstr((const char *) &buf.data, "OK\r\n") == NULL) {
-    printf("waiting 1 second\n");
-    printf("buffer: %s\n", buf.data);
-    nrf_delay_ms(1000); // wait until you read "OK" in the response
-    }
-    // reset the buffer
-    printf("resetting buffer");
-    printf("old buffer %s", buf.data);
-    buf.data[0] = 0;
-    buf.size = 0;
-    printf("new buffer %s", buf.data);
-    return 0;
-}
-
 void esp_init() { 
     char connect[128];
     esp_send("AT+CWMODE=1\r\n"); // set ESP to client mode
     nrf_delay_ms(3000);
 
     sprintf(connect, "AT+CWJAP=\"%s\",\"%s\"\r\n",SSID, PWD); // connect to network
-    printf("connect is: %s \n", connect);
     esp_send(connect);
     nrf_delay_ms(10000);
 }
 
 void reset_buffer() {
-    printf("RESET_BUFFER\n");
     buf.size = 0;
     memset(buf.data, 0, sizeof(buf.data));
 }
@@ -88,7 +70,7 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
 
 
     if (ble_addr[5] == 0xc0 && ble_addr[4] == 0x98 && ble_addr[3] == 0xe5){
-        latest_id = adv_buf[5];
+        service_request = true;
     }
 }
 
@@ -118,7 +100,6 @@ void uart_error_handle (app_uart_evt_t * p_event) {
       app_uart_get(&ret);
       char* ch = (char *) &ret;
       strcpy(&(buf.data[buf.size]), ch);
-      printf("%c", buf.data[buf.size]);
       buf.size++;
     }
 }

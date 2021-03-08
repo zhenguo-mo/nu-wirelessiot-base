@@ -20,8 +20,7 @@ struct B
   size_t size; 
 } buf;
 
-extern uint8_t serviced_adv_id;
-extern uint8_t latest_id;
+extern bool service_request;
 
 // Pin configurations
 #define UART_RX              NRF_GPIO_PIN_MAP(0, 8)
@@ -57,6 +56,8 @@ void begin_scanning();
 
 /* END OF BLE FUNCTIONS */
 
+
+
 /* WIFI FUNCTIONS */
 
 // Function for connecting the ESP to the internet
@@ -82,6 +83,8 @@ void esp_receive(char* buf);
 void reset_buffer();
 
 /* END OF WIFI FUNCTIONS */
+
+
 
 /* UART FUNCTIONS */
 

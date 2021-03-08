@@ -8,7 +8,6 @@ int main(void) {
   begin_scanning();
   advertising_stop;
   while (1) {
-    printf("Current adv_id: %u\n", adv_id);
     if (!nrf_gpio_pin_read(BUTTON1)) {
         begin_advertising();
         nrf_delay_ms(5000);

@@ -9,13 +9,8 @@ int main(void) {
   begin_scanning();
   advertising_stop();
   while (1) {
-    /* IF SCANNING SUCCESSFUL (global variable first <= latest global variable), DO RSSI and ADVERTISING */
     printf("Currently scanning\n");
-    printf("Current_values:\n");
-    printf("serviced_adv_id: %u\n", serviced_adv_id);
-    printf("latest_id: %u\n", latest_id);
-    if (sevice_request){
-      serviced_adv_id = latest_id;
+    if (service_request){
       int rssi = esp_get_rssi();
       int ping = esp_get_ping();
       printf("RSSI: %i\n", rssi);
