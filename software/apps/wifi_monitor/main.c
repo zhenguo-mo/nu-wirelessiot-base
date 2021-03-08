@@ -14,7 +14,7 @@ int main(void) {
     printf("Current_values:\n");
     printf("serviced_adv_id: %u\n", serviced_adv_id);
     printf("latest_id: %u\n", latest_id);
-    if (serviced_adv_id < latest_id){
+    if (sevice_request){
       serviced_adv_id = latest_id;
       int rssi = esp_get_rssi();
       int ping = esp_get_ping();
@@ -26,6 +26,7 @@ int main(void) {
       nrf_delay_ms(5000);
       advertising_stop();
       printf("STOPPED BLE ADVERTISING\n");
+      service_request = false;
     }
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     nrf_delay_ms(2000);

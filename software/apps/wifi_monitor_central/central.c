@@ -1,5 +1,4 @@
 #include "central.h"
-uint8_t adv_id = 1;
 
 void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
 
@@ -15,7 +14,7 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
   
   // filter to only read the board's data
   if (mac_address[0] == 0xc0 && mac_address[1] == 0x98){
-    printf("\n\nRECEIVED AN ADVERTISEMENT!\n");
+    printf("\n\nRECEIVED METRICS\n");
     printf("MAC Address: %x:%x:%x:%x:%x:%x\n", mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
     
     printf("Advertisement Payload: \n");
@@ -30,7 +29,7 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
 }
  
 void begin_advertising(){
-    uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x02 , 0xFF, adv_id++};
+    uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x02 , 0xFF, 0x01};
 
     simple_ble_adv_raw(ble_data, 6);
     printf("Started BLE advertisements\n");

@@ -73,7 +73,7 @@ void begin_advertising(int ping, int rssi){
     uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x08, 0x09, 0x54, 0x45, 0x43, 0x48, 0x34, 0x39, 0x37,
     0x02, 0x0A, rssi, 0x03, 0xFF, ping};
 
-    simple_ble_adv_raw(ble_data, 18);
+    simple_ble_adv_raw(ble_data, 19);
     printf("Started BLE advertisements\n");
 }
 
