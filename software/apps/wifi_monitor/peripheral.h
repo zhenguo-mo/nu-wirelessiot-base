@@ -23,6 +23,13 @@ struct B
 extern uint8_t serviced_adv_id;
 extern uint8_t latest_id;
 
+// Pin configurations
+#define UART_RX              NRF_GPIO_PIN_MAP(0, 8)
+#define UART_TX              NRF_GPIO_PIN_MAP(0, 6)
+#define UART_TX_BUF_SIZE     512
+#define UART_RX_BUF_SIZE     512
+#define MAX_TEST_DATA_BYTES     (15U)   
+
 // BLUETOOTH ADVERTISING SETUP
 // Intervals for advertising and connections
 static simple_ble_config_t ble_config = {
@@ -75,3 +82,13 @@ void esp_receive(char* buf);
 void reset_buffer();
 
 /* END OF WIFI FUNCTIONS */
+
+/* UART FUNCTIONS */
+
+/* Handles events and errors on the UART module */
+void uart_error_handle(app_uart_evt_t * p_event);
+
+/* Initializes the UART module */
+void uart_init();
+
+/* END OF UART FUNCTIONS */

@@ -8,7 +8,7 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
   uint8_t const* ble_addr = adv_report->peer_addr.addr; // array of 6 bytes of the address
   uint8_t* adv_buf = adv_report->data.p_data; // array of up to 31 bytes of advertisement payload data
   uint16_t adv_len = adv_report->data.len; // length of advertisement payload data
-  uint8_t tx_power = adv_report->tx_power; //actual tx power
+//   uint8_t tx_power = adv_report->tx_power; //actual tx power
 
   // Get mac address in big endian
   uint8_t mac_address[6] = {ble_addr[5], ble_addr[4], ble_addr[3], ble_addr[2], ble_addr[1], ble_addr[0]};
@@ -20,18 +20,12 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
     
     printf("Advertisement Payload: \n");
 
-    // print payload info 
-    printf("PAYLOAD \n");
-    for (int i=0; i<adv_len; i++){
-      printf("%c", adv_buf[i]);
-    }
+    int8_t ping, rssi;
+    ping = adv_buf[17];
+    rssi = adv_buf[14];
 
-    int* x = (int *) &adv_buf[17];
-    printf("Possibly ping: \n, %d", *x);
-
-
-    /* PRINT TX POWER */
-    printf("TX Power: %02x\n", tx_power);
+    printf("RSSI: %d\n", rssi);
+    printf("Ping: %dms\n", ping);
   }
 }
  
@@ -40,10 +34,6 @@ void begin_advertising(){
 
     simple_ble_adv_raw(ble_data, 6);
     printf("Started BLE advertisements\n");
-
-    nrf_delay_ms(20000);
-    advertising_stop();
-    printf("STOPPED BLE ADVERTISING\n");
 }
 
 void configure_button_renew_advertising(){

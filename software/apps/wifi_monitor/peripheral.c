@@ -1,6 +1,6 @@
 #include "peripheral.h"
 uint8_t serviced_adv_id = 0;
-uint8_t latest_id = 1;
+uint8_t latest_id = 0;
 
 void esp_send(const char* command) {
     uint8_t len = strlen(command); 
@@ -73,7 +73,7 @@ void begin_advertising(int ping, int rssi){
     uint8_t ble_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX] = {0x02, 0x01, 0x06, 0x08, 0x09, 0x54, 0x45, 0x43, 0x48, 0x34, 0x39, 0x37,
     0x02, 0x0A, rssi, 0x03, 0xFF, ping};
 
-    simple_ble_adv_raw(ble_data, 19);
+    simple_ble_adv_raw(ble_data, 18);
     printf("Started BLE advertisements\n");
 }
 
@@ -84,7 +84,7 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
     ble_gap_evt_adv_report_t const* adv_report = &(p_ble_evt->evt.gap_evt.params.adv_report);
     uint8_t const* ble_addr = adv_report->peer_addr.addr; // array of 6 bytes of the address
     uint8_t* adv_buf = adv_report->data.p_data; // array of up to 31 bytes of advertisement payload data
-    uint16_t adv_len = adv_report->data.len; // length of advertisement payload data
+    // uint16_t adv_len = adv_report->data.len; // length of advertisement payload data
 
 
     if (ble_addr[5] == 0xc0 && ble_addr[4] == 0x98 && ble_addr[3] == 0xe5){
@@ -94,4 +94,63 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt) {
 
 void begin_scanning(){
     scanning_start();
+}
+
+// event handler for UART
+void uart_error_handle (app_uart_evt_t * p_event) {
+  if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR) 
+    {
+    printf("communicatoin error \n");
+    APP_ERROR_HANDLER(p_event->data.error_communication);
+    } 
+  else if (p_event->evt_type == APP_UART_FIFO_ERROR) 
+    {
+    printf("FIFO error \n");
+    APP_ERROR_HANDLER(p_event->data.error_code);
+    }
+  else if (p_event->evt_type == APP_UART_DATA_READY) 
+    {
+      printf("data ready \n");
+    }
+  else if (p_event->evt_type == APP_UART_DATA) 
+    {
+      uint8_t ret;
+      app_uart_get(&ret);
+      char* ch = (char *) &ret;
+      strcpy(&(buf.data[buf.size]), ch);
+      printf("%c", buf.data[buf.size]);
+      buf.size++;
+    }
+}
+
+
+// initialization of UART
+void uart_init(void) {
+  uint32_t err_code;
+
+  // This structure hold configuration information for the peripheral
+  // configure RX and TX pins
+  // no RTS or CTS pins with flow control disabled
+  // no parity
+  // baudrate 115200
+  const app_uart_comm_params_t comm_params = {
+    (uint32_t) 8, 
+    (uint32_t) 6,
+    0,
+    0,
+    APP_UART_FLOW_CONTROL_DISABLED,
+    false,
+    NRF_UARTE_BAUDRATE_115200
+  };
+
+  // actually initialize UART
+  APP_UART_FIFO_INIT(
+    &comm_params, 
+    UART_RX_BUF_SIZE, 
+    UART_TX_BUF_SIZE,
+    uart_error_handle, 
+    APP_IRQ_PRIORITY_LOW, 
+    err_code);
+  APP_ERROR_CHECK(err_code);
+
 }
