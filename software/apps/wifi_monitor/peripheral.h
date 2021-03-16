@@ -11,8 +11,8 @@
 #include "simple_ble.h"
 #include "nrf52840dk.h"
 
-#define SSID "ATT6yzKXPi"
-#define PWD "jjtn%g8n7zp4"
+#define SSID "aleena"
+#define PWD "aleena123"
 
 struct B
 {
@@ -21,6 +21,7 @@ struct B
 } buf;
 
 extern bool service_request;
+extern bool connection_request;
 
 // Pin configurations
 #define UART_RX              NRF_GPIO_PIN_MAP(0, 8)
@@ -34,7 +35,7 @@ extern bool service_request;
 static simple_ble_config_t ble_config = {
         // c0:98:e5:4e:xx:xx
         .platform_id       = 0x4E,   // used as 4th octect in device BLE address
-        .device_id         = 0xAABB, // must be unique on each device you program!
+        .device_id         = 0xAACC, // must be unique on each device you program!
         .adv_name          = "CB497", // used in advertisements if there is room
         .adv_interval      = MSEC_TO_UNITS(1000, UNIT_0_625_MS),
         .min_conn_interval = MSEC_TO_UNITS(500, UNIT_1_25_MS),
@@ -46,19 +47,17 @@ simple_ble_app_t* simple_ble_app;
 /* BLE FUNCTIONS */
 
 /* Begin advertising the results of a speed test */
-void begin_advertising(int ping, int rssi);
+void send_metrics(int ping, int rssi, bool status);
 
 /* Callback handler for reading from central when to begin speedtest */
 void ble_evt_adv_report(ble_evt_t const* p_ble_evt);
 
-/* Begin scanning for central for when it's asking for data */
-void begin_scanning();
 
 /* END OF BLE FUNCTIONS */
 
 
 
-/* WIFI FUNCTIONS */
+/* WIFI/ESP8266 FUNCTIONS */
 
 // Function for connecting the ESP to the internet
 void esp_init();
@@ -81,6 +80,9 @@ void esp_receive(char* buf);
 
 // Resets the global variable buffer (buf).
 void reset_buffer();
+
+/* Checks if the device is connected */
+bool esp_is_connected();
 
 /* END OF WIFI FUNCTIONS */
 

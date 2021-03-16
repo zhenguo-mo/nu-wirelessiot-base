@@ -10,7 +10,7 @@
 #include "nrf52840dk.h"
 #include "simple_ble.h"
 // Must be able to request individual metrics
-// Configure buttion IO to get metrics
+// Configure button IO to get metrics
 // Advertise Bluetooth
 // Peripherals listening for Central
 // When it hears command, run tests
@@ -34,10 +34,13 @@ void ble_evt_adv_report(ble_evt_t const* p_ble_evt);
 /* END OF SCANNER DEFINITIONS */
 
 /* Configures button to renew advertising() */
-void configure_button_renew_advertising();
+void configure_button_requests();
 
 /* Begin advertising to tell peripheral to renew data */
-void begin_advertising();
+void request_metrics();
+
+/* Command peripherals to reestablish connection to WiFi*/
+void connect_command();
 
 /* Begin scanning to read peripheral data payload*/
 void begin_scanning();
