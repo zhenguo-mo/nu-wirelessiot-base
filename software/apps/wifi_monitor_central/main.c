@@ -4,15 +4,22 @@
 
 int main(void) {
   simple_ble_app = simple_ble_init(&ble_config);
-  configure_button_renew_advertising();
+  configure_button_requests();
   begin_scanning();
-  advertising_stop;
+  advertising_stop();
+  printf("\n\nREADY TO SEND REQUESTS\n");
   while (1) {
     if (!nrf_gpio_pin_read(BUTTON1)) {
-        begin_advertising();
+        request_metrics();
         nrf_delay_ms(5000);
         advertising_stop();
-        printf("STOPPED BLE ADVERTISING\n");
+        printf("STOPPED REQUESTING\n");
+    }
+    if (!nrf_gpio_pin_read(BUTTON2)) {
+        connect_command();
+        nrf_delay_ms(5000);
+        advertising_stop();
+        printf("STOPPED REQUESTING\n");
     }
     nrf_delay_ms(2000);
   }
